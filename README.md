@@ -1,9 +1,9 @@
 # N_EnhancedAutosave
 Adds some improvements to the existing autosave feature, namely:
 
-- The ability to stop autosaves from increasing the "Save Count" variable.
+- The ability to stop autosaves from increasing the "Save Count" variable (can be turned off).
 - The ability to disable autosaves for individual maps (for example Test maps).
-- A window that displays whether an autosave is in progress, has succeeded, or has failed.
+- A window that displays whether an autosave is in progress, has succeeded, or has failed (can be turned off).
 - A Plugin Command to trigger autosaves at any time during an event. Useful after a lengthy cutscene, a completed quest, or even shortly before an important decision.
 
 | Project            | Latest release      |
