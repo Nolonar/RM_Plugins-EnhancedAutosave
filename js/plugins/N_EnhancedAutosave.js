@@ -43,6 +43,7 @@
  * @type boolean
  * @default true
  * 
+ * 
  * @command autosave
  * @text Autosave
  * @desc Triggers an autosave.
@@ -76,14 +77,16 @@
     const MESSAGE_SAVE_SUCCESS = "Saved";
     const MESSAGE_SAVE_FAILURE = "Saving failed";
 
-    // Code
+    //=========================================================================
+    // Constants
+    //=========================================================================
     const PLUGIN_NAME = "N_EnhancedAutosave";
     const COMMAND_AUTOSAVE = "autosave";
     const NOTETAG_NO_AUTOSAVE = "no autosave";
 
     let parameters = PluginManager.parameters(PLUGIN_NAME);
-    parameters.preserveSaveCount = Boolean(parameters.preserveSaveCount) || true;
-    parameters.displayAutosaveWindow = Boolean(parameters.displayAutosaveWindow) || true;
+    parameters.preserveSaveCount = parameters.preserveSaveCount.toLowerCase() === "true";
+    parameters.displayAutosaveWindow = parameters.displayAutosaveWindow.toLowerCase() === "true";
 
     PluginManager.registerCommand(PLUGIN_NAME, COMMAND_AUTOSAVE, () => {
         SceneManager._scene.executeAutosave();
