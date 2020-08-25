@@ -49,7 +49,7 @@
  * @desc Triggers an autosave.
  * 
  * 
- * @help Version 1.0.0
+ * @help Version 1.0.1
  * 
  * ============================================================================
  * Plugin Commands
