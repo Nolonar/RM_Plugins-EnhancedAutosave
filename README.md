@@ -8,7 +8,7 @@ Adds some improvements to the existing autosave feature, namely:
 
 | Project            | Latest release   |
 | ------------------ | ---------------- |
-| N_EnhancedAutosave | [1.0.1][release] |
+| N_EnhancedAutosave | [1.0.2][release] |
 
 [All RPG Maker plugins by Nolonar][hub]
 
