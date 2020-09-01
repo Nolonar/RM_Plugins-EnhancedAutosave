@@ -49,7 +49,7 @@
  * @desc Triggers an autosave.
  * 
  * 
- * @help Version 1.0.1
+ * @help Version 1.0.2
  * 
  * ============================================================================
  * Plugin Commands
@@ -96,21 +96,13 @@
     // Window_AutosaveMessage
     //=========================================================================
     class Window_AutosaveMessage extends Window_Base {
-        // The lazy singleton is needed because by the time this plugin is loaded,
-        // $gameSystem is not yet set, so Window_Base.fittingHeight() will crash.
-        static singleton = null;
-        static get instance() {
-            if (!this.singleton)
-                this.singleton = new Window_AutosaveMessage();
-
-            return this.singleton;
-        }
-
-        initialize(rect) {
-            super.initialize(rect || new Rectangle(0, 0, 360, this.fittingHeight(1)));
+        initialize(parent) {
+            const rect = new Rectangle(0, 0, 360, this.fittingHeight(1));
+            super.initialize(rect);
 
             this.opacity = 0;
             this.reset();
+            parent.addWindow(this);
         }
 
         reset() {
@@ -171,6 +163,8 @@
     //=========================================================================
     // Scene_Base
     //=========================================================================
+    let autosaveWindow = null;
+
     let Scene_Base_executeAutosave = Scene_Base.prototype.executeAutosave;
     Scene_Base.prototype.executeAutosave = function () {
         if (parameters.preserveSaveCount)
@@ -179,8 +173,8 @@
         Scene_Base_executeAutosave.call(this);
 
         if (parameters.displayAutosaveWindow) {
-            Window_AutosaveMessage.instance.addTo(this);
-            Window_AutosaveMessage.instance.show(MESSAGE_SAVING);
+            autosaveWindow = new Window_AutosaveMessage(this);
+            autosaveWindow.show(MESSAGE_SAVING);
         }
     }
 
@@ -189,7 +183,7 @@
         Scene_Base_onAutosaveSuccess.call(this);
 
         if (parameters.displayAutosaveWindow)
-            Window_AutosaveMessage.instance.show(MESSAGE_SAVE_SUCCESS);
+            autosaveWindow.show(MESSAGE_SAVE_SUCCESS);
     }
 
     let Scene_Base_onAutosaveFailure = Scene_Base.prototype.onAutosaveFailure;
@@ -197,7 +191,14 @@
         Scene_Base_onAutosaveFailure.call(this);
 
         if (parameters.displayAutosaveWindow)
-            Window_AutosaveMessage.instance.show(MESSAGE_SAVE_FAILURE);
+            autosaveWindow.show(MESSAGE_SAVE_FAILURE);
+    }
+
+    let Scene_Base_stop = Scene_Base.prototype.stop;
+    Scene_Base.prototype.stop = function () {
+        Scene_Base_stop.call(this);
+        if (autosaveWindow)
+            autosaveWindow.hide();
     }
 
     //=========================================================================
