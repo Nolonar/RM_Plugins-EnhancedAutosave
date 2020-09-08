@@ -23,13 +23,13 @@
  */
 
 //=============================================================================
-// N_EnhancedAutosave
+// Metadata
 //=============================================================================
 /*:
  * @target MZ
  * @plugindesc Adds some improvements to the existing autosave feature.
  * @author Nolonar
- * @url https://github.com/Nolonar/RM_Plugins-EnhancedAutosave
+ * @url https://github.com/Nolonar/RM_Plugins
  * 
  * @param displayAutosaveWindow
  * @text Display Autosave Window
@@ -43,13 +43,31 @@
  * @type boolean
  * @default true
  * 
+ * @param textSaving
+ * @text "Saving" text
+ * @desc The text to display when the game is saving.
+ * @type string
+ * @default Saving
+ * 
+ * @param textSaveSuccess
+ * @text "Save success" text
+ * @desc The text to display when the game saved successfully.
+ * @type string
+ * @default Saved
+ * 
+ * @param textSaveFailed
+ * @text "Save failed" text
+ * @desc The text to display when the game failed to save.
+ * @type string
+ * @deafult Saving failed
+ * 
  * 
  * @command autosave
  * @text Autosave
  * @desc Triggers an autosave.
  * 
  * 
- * @help Version 1.0.2
+ * @help Version 1.1.0
  * 
  * ============================================================================
  * Plugin Commands
@@ -71,22 +89,18 @@
 
 (() => {
     //=========================================================================
-    // To localize
-    //=========================================================================
-    const MESSAGE_SAVING = "Saving";
-    const MESSAGE_SAVE_SUCCESS = "Saved";
-    const MESSAGE_SAVE_FAILURE = "Saving failed";
-
-    //=========================================================================
     // Constants
     //=========================================================================
     const PLUGIN_NAME = "N_EnhancedAutosave";
     const COMMAND_AUTOSAVE = "autosave";
     const NOTETAG_NO_AUTOSAVE = "no autosave";
 
-    let parameters = PluginManager.parameters(PLUGIN_NAME);
-    parameters.preserveSaveCount = parameters.preserveSaveCount.toLowerCase() === "true";
-    parameters.displayAutosaveWindow = parameters.displayAutosaveWindow.toLowerCase() === "true";
+    const parameters = PluginManager.parameters(PLUGIN_NAME);
+    parameters.preserveSaveCount = parameters.preserveSaveCount === "true";
+    parameters.displayAutosaveWindow = parameters.displayAutosaveWindow === "true";
+    parameters.textSaving = parameters.textSaving || "Saving";
+    parameters.textSaveSuccess = parameters.textSaveSuccess || "Saved";
+    parameters.textSaveFailed = parameters.textSaveFailed || "Saving failed"
 
     PluginManager.registerCommand(PLUGIN_NAME, COMMAND_AUTOSAVE, () => {
         SceneManager._scene.executeAutosave();
@@ -102,17 +116,14 @@
 
             this.opacity = 0;
             this.reset();
-            parent.addWindow(this);
+            parent.addChild(this);
         }
 
         reset() {
-            if (this.parent) {
-                this.parent.removeChild(this);
-            }
-            if (this.closingTimeout) {
-                clearTimeout(this.closingTimeout);
-                this.closingTimeout = null;
-            }
+            this.parent?.removeChild(this);
+            clearTimeout(this.closingTimeout);
+            this.closingTimeout = null;
+
             this.contentsOpacity = 0;
             this.isFadingIn = false;
             this.isFadingOut = false;
@@ -136,8 +147,7 @@
         }
 
         show(message) {
-            if (this.closingTimeout)
-                clearTimeout(this.closingTimeout);
+            clearTimeout(this.closingTimeout);
 
             this.drawMessage(message);
             this.isFadingIn = true;
@@ -165,7 +175,7 @@
     //=========================================================================
     let autosaveWindow = null;
 
-    let Scene_Base_executeAutosave = Scene_Base.prototype.executeAutosave;
+    const Scene_Base_executeAutosave = Scene_Base.prototype.executeAutosave;
     Scene_Base.prototype.executeAutosave = function () {
         if (parameters.preserveSaveCount)
             this._saveCount--;
@@ -174,38 +184,37 @@
 
         if (parameters.displayAutosaveWindow) {
             autosaveWindow = new Window_AutosaveMessage(this);
-            autosaveWindow.show(MESSAGE_SAVING);
+            autosaveWindow.show(parameters.textSaving);
         }
     }
 
-    let Scene_Base_onAutosaveSuccess = Scene_Base.prototype.onAutosaveSuccess;
+    const Scene_Base_onAutosaveSuccess = Scene_Base.prototype.onAutosaveSuccess;
     Scene_Base.prototype.onAutosaveSuccess = function () {
         Scene_Base_onAutosaveSuccess.call(this);
 
-        if (parameters.displayAutosaveWindow)
-            autosaveWindow.show(MESSAGE_SAVE_SUCCESS);
+        autosaveWindow?.show(parameters.textSaveSuccess);
     }
 
-    let Scene_Base_onAutosaveFailure = Scene_Base.prototype.onAutosaveFailure;
+    const Scene_Base_onAutosaveFailure = Scene_Base.prototype.onAutosaveFailure;
     Scene_Base.prototype.onAutosaveFailure = function () {
         Scene_Base_onAutosaveFailure.call(this);
 
-        if (parameters.displayAutosaveWindow)
-            autosaveWindow.show(MESSAGE_SAVE_FAILURE);
+        autosaveWindow?.show(parameters.textSaveFailed);
     }
 
-    let Scene_Base_stop = Scene_Base.prototype.stop;
+    const Scene_Base_stop = Scene_Base.prototype.stop;
     Scene_Base.prototype.stop = function () {
         Scene_Base_stop.call(this);
-        if (autosaveWindow)
-            autosaveWindow.hide();
+
+        autosaveWindow?.hide();
     }
 
     //=========================================================================
     // Scene_Map
     //=========================================================================
-    let Scene_Map_isAutosaveEnabled = Scene_Map.prototype.isAutosaveEnabled;
+    const Scene_Map_isAutosaveEnabled = Scene_Map.prototype.isAutosaveEnabled;
     Scene_Map.prototype.isAutosaveEnabled = function () {
-        return !(NOTETAG_NO_AUTOSAVE in $dataMap.meta) && Scene_Map_isAutosaveEnabled.call(this);
+        return !(NOTETAG_NO_AUTOSAVE in $dataMap.meta)
+            && Scene_Map_isAutosaveEnabled.call(this);
     }
 })();
