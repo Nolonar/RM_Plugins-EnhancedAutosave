@@ -6,9 +6,9 @@ Adds some improvements to the existing autosave feature, namely:
 - A window that displays whether an autosave is in progress, has succeeded, or has failed (can be turned off).
 - A Plugin Command to trigger autosaves at any time during an event. Useful after a lengthy cutscene, a completed quest, or even shortly before an important decision.
 
-| Project            | Latest release   |
-| ------------------ | ---------------- |
-| N_EnhancedAutosave | [1.0.2][release] |
+| Project            | Latest release      |
+| ------------------ | ------------------- |
+| N_EnhancedAutosave | [Download][release] |
 
 [All RPG Maker plugins by Nolonar][hub]
 
