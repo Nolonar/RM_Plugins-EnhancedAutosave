@@ -59,7 +59,7 @@
  * @text "Save failed" text
  * @desc The text to display when the game failed to save.
  * @type string
- * @deafult Saving failed
+ * @default Saving failed
  * 
  * 
  * @command autosave
